@@ -15,8 +15,8 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import {
     BookOpen,
+    Building,
     Folder,
-    Layers2,
     LayoutGrid,
     List,
     MapPin,
@@ -33,7 +33,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Companies',
         href: '#',
-        icon: Layers2,
+        icon: Building,
     },
     {
         title: 'Locations',

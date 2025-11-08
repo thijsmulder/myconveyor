@@ -215,7 +215,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
                 <div className="mb-4 flex gap-3">
                     <InputGroup className="w-60">
                         <InputGroupInput
-                            placeholder="Search equipment..."
+                            placeholder="Search items..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
