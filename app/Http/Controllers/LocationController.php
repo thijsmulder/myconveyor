@@ -81,6 +81,7 @@ class LocationController extends Controller
             )
             ->where('equipment_id', $equipment->id)
             ->where('location_id', $location->id)
+            ->orderBy('myconveyor_id', 'asc')
             ->get();
 
         // Pass data to Inertia view
