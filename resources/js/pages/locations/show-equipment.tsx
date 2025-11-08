@@ -27,14 +27,14 @@ import type { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
 import {
     ArrowUpDown,
-    EllipsisVertical,
-    SearchIcon,
+    Check,
     ChevronDown,
     ChevronRight,
-    LoaderIcon,
-    Check,
-    Hammer,
     CircleX,
+    EllipsisVertical,
+    Hammer,
+    LoaderIcon,
+    SearchIcon,
 } from 'lucide-react';
 import { Fragment, useMemo, useState } from 'react';
 
@@ -88,11 +88,17 @@ export default function EquipmentShow({ location, equipment }: Props) {
     const { records } = usePage<{ records: EquipmentRecord[] }>().props;
 
     const [search, setSearch] = useState('');
-    const [sortKey, setSortKey] = useState<keyof EquipmentRecord>('myconveyor_id');
+    const [sortKey, setSortKey] =
+        useState<keyof EquipmentRecord>('myconveyor_id');
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
-    const excludedColumns = ['id', 'location_id', 'equipment_id', 'myconveyor_id'];
+    const excludedColumns = [
+        'id',
+        'location_id',
+        'equipment_id',
+        'myconveyor_id',
+    ];
 
     // Filter and sort
     const filteredData = useMemo(() => {
@@ -102,8 +108,11 @@ export default function EquipmentShow({ location, equipment }: Props) {
                     .filter(([key]) => !excludedColumns.includes(key))
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                     .some(([_, val]) =>
-                        val?.toString().toLowerCase().includes(search.toLowerCase())
-                    )
+                        val
+                            ?.toString()
+                            .toLowerCase()
+                            .includes(search.toLowerCase()),
+                    ),
             )
             .sort((a, b) => {
                 const aVal = a[sortKey] ?? '';
@@ -118,7 +127,8 @@ export default function EquipmentShow({ location, equipment }: Props) {
     const groupedData = useMemo(() => {
         const groups: Record<string, EquipmentRecord[]> = {};
         filteredData.forEach((record) => {
-            if (!groups[record.myconveyor_id]) groups[record.myconveyor_id] = [];
+            if (!groups[record.myconveyor_id])
+                groups[record.myconveyor_id] = [];
             groups[record.myconveyor_id].push(record);
         });
         return groups;
@@ -136,15 +146,48 @@ export default function EquipmentShow({ location, equipment }: Props) {
     const renderStatusBadge = (statusId: number) => {
         switch (statusId) {
             case 1:
-                return <Badge variant="secondary" className="bg-white text-blue-800"><LoaderIcon className="text-primary"/> To be defined</Badge>;
+                return (
+                    <Badge
+                        variant="secondary"
+                        className="bg-white text-blue-800"
+                    >
+                        <LoaderIcon className="text-primary" /> To be defined
+                    </Badge>
+                );
             case 2:
-                return <Badge variant="secondary" className="bg-white text-green-700"><Check className="text-green-700" /> Operating condition</Badge>;
+                return (
+                    <Badge
+                        variant="secondary"
+                        className="bg-white text-green-700"
+                    >
+                        <Check className="text-green-700" /> Operating condition
+                    </Badge>
+                );
             case 3:
-                return <Badge variant="secondary" className="bg-white text-red-700"><CircleX className="text-red-700"/> Out of specification</Badge>;
+                return (
+                    <Badge
+                        variant="secondary"
+                        className="bg-white text-red-700"
+                    >
+                        <CircleX className="text-red-700" /> Out of
+                        specification
+                    </Badge>
+                );
             case 4:
-                return <Badge variant="secondary" className="bg-white text-orange-800"><Hammer className="text-orange-500"/> Plan replacement</Badge>;
+                return (
+                    <Badge
+                        variant="secondary"
+                        className="bg-white text-orange-800"
+                    >
+                        <Hammer className="text-orange-500" /> Plan replacement
+                    </Badge>
+                );
             default:
-                return <Badge variant="secondary" className="bg-white">Unknown</Badge>;
+                return (
+                    <Badge variant="secondary" className="bg-white">
+                        Unknown
+                    </Badge>
+                );
         }
     };
 
@@ -155,11 +198,14 @@ export default function EquipmentShow({ location, equipment }: Props) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Locations', href: '/locations' },
         { title: location.name, href: `/locations/${location.slug}` },
-        { title: equipment.name, href: `/locations/${location.slug}/${equipment.slug}` },
+        {
+            title: equipment.name,
+            href: `/locations/${location.slug}/${equipment.slug}`,
+        },
     ];
 
     const tableColumns = Object.keys(records[0] || {}).filter(
-        (col) => !excludedColumns.includes(col)
+        (col) => !excludedColumns.includes(col),
     );
 
     return (
@@ -173,7 +219,9 @@ export default function EquipmentShow({ location, equipment }: Props) {
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                         />
-                        <InputGroupAddon><SearchIcon /></InputGroupAddon>
+                        <InputGroupAddon>
+                            <SearchIcon />
+                        </InputGroupAddon>
                     </InputGroup>
                 </div>
 
@@ -181,11 +229,17 @@ export default function EquipmentShow({ location, equipment }: Props) {
                     <Table>
                         <TableHeader>
                             <TableRow className="h-8 bg-primary hover:bg-primary dark:bg-sidebar">
-                                <TableHead className="px-4 text-white">MyConveyor ID</TableHead>
+                                <TableHead className="px-4 text-white">
+                                    MyConveyor ID
+                                </TableHead>
                                 {tableColumns.map((col) => (
                                     <TableHead
                                         key={col}
-                                        onClick={() => toggleSort(col as keyof EquipmentRecord)}
+                                        onClick={() =>
+                                            toggleSort(
+                                                col as keyof EquipmentRecord,
+                                            )
+                                        }
                                         className="cursor-pointer px-4 text-white capitalize"
                                     >
                                         {col.replace(/_/g, ' ')}
@@ -198,64 +252,109 @@ export default function EquipmentShow({ location, equipment }: Props) {
 
                         <TableBody>
                             {Object.entries(groupedData).length > 0 ? (
-                                Object.entries(groupedData).map(([myconveyorId, records]) => (
-                                    <Fragment key={myconveyorId}>
-                                        {/* Parent Row */}
-                                        <TableRow
-                                            className="h-12 cursor-pointer hover:bg-primary-hover"
-                                            onClick={() => toggleExpand(myconveyorId)}
-                                        >
-                                            <TableCell className="px-4 flex items-center gap-2">
-                                                {expanded[myconveyorId] ? <Button size="icon" variant="ghost"><ChevronDown /></Button> : <Button size="icon" variant="ghost"><ChevronRight /></Button>}
-                                                {myconveyorId}
-                                            </TableCell>
-                                            {tableColumns.map((col) => (
-                                                <TableCell key={col} className="px-4">
-                                                    {records[0][col as keyof EquipmentRecord]?.toString() || '-'}
+                                Object.entries(groupedData).map(
+                                    ([myconveyorId, records]) => (
+                                        <Fragment key={myconveyorId}>
+                                            {/* Parent Row */}
+                                            <TableRow
+                                                className="h-12 cursor-pointer hover:bg-primary-hover dark:hover:bg-sidebar-accent"
+                                                onClick={() =>
+                                                    toggleExpand(myconveyorId)
+                                                }
+                                            >
+                                                <TableCell className="flex items-center gap-2 px-4">
+                                                    {expanded[myconveyorId] ? (
+                                                        <Button
+                                                            size="icon"
+                                                            variant="ghost"
+                                                        >
+                                                            <ChevronDown />
+                                                        </Button>
+                                                    ) : (
+                                                        <Button
+                                                            size="icon"
+                                                            variant="ghost"
+                                                        >
+                                                            <ChevronRight />
+                                                        </Button>
+                                                    )}
+                                                    {myconveyorId}
                                                 </TableCell>
-                                            ))}
-                                            <TableCell className="px-4 text-right"></TableCell>
-                                        </TableRow>
-
-                                        {/* Expanded Rows */}
-                                        {expanded[myconveyorId] &&
-                                            records.map((record) => (
-                                                <TableRow
-                                                    key={record.id}
-                                                    className="h-10 hover:bg-primary-hover bg-sidebar"
-                                                >
-                                                    <TableCell className="px-4 text-muted-foreground">{myconveyorId}</TableCell>
-                                                    {tableColumns.map((col) => (
-                                                        <TableCell key={col} className="px-4 text-sm">
-                                                            {col === 'status_id'
-                                                                ? renderStatusBadge(record.status_id)
-                                                                : record[col as keyof EquipmentRecord]?.toString() || '-'}
-                                                        </TableCell>
-                                                    ))}
-                                                    <TableCell className="px-4 text-right">
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild>
-                                                                <Button variant="ghost" size="sm">
-                                                                    <EllipsisVertical />
-                                                                </Button>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent align="end">
-                                                                <DropdownMenuLabel className="text-sm text-muted-foreground">Actions</DropdownMenuLabel>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem>
-                                                                    View
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
+                                                {tableColumns.map((col) => (
+                                                    <TableCell
+                                                        key={col}
+                                                        className="px-4"
+                                                    >
+                                                        {records[0][
+                                                            col as keyof EquipmentRecord
+                                                        ]?.toString() || '-'}
                                                     </TableCell>
-                                                </TableRow>
-                                            ))}
+                                                ))}
+                                                <TableCell className="px-4 text-right"></TableCell>
+                                            </TableRow>
 
-                                    </Fragment>
-                                ))
+                                            {/* Expanded Rows */}
+                                            {expanded[myconveyorId] &&
+                                                records.map((record) => (
+                                                    <TableRow
+                                                        key={record.id}
+                                                        className="h-10 bg-sidebar hover:bg-primary-hover dark:hover:bg-sidebar-accent"
+                                                    >
+                                                        <TableCell className="px-4 text-muted-foreground">
+                                                            {myconveyorId}
+                                                        </TableCell>
+                                                        {tableColumns.map(
+                                                            (col) => (
+                                                                <TableCell
+                                                                    key={col}
+                                                                    className="px-4 text-sm"
+                                                                >
+                                                                    {col ===
+                                                                    'status_id'
+                                                                        ? renderStatusBadge(
+                                                                              record.status_id,
+                                                                          )
+                                                                        : record[
+                                                                              col as keyof EquipmentRecord
+                                                                          ]?.toString() ||
+                                                                          '-'}
+                                                                </TableCell>
+                                                            ),
+                                                        )}
+                                                        <TableCell className="px-4 text-right">
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger
+                                                                    asChild
+                                                                >
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                    >
+                                                                        <EllipsisVertical />
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent align="end">
+                                                                    <DropdownMenuLabel className="text-sm text-muted-foreground">
+                                                                        Actions
+                                                                    </DropdownMenuLabel>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem>
+                                                                        View
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                        </Fragment>
+                                    ),
+                                )
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={tableColumns.length + 2} className="h-12 text-center">
+                                    <TableCell
+                                        colSpan={tableColumns.length + 2}
+                                        className="h-12 text-center"
+                                    >
                                         No results found
                                     </TableCell>
                                 </TableRow>
