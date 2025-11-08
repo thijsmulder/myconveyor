@@ -45,8 +45,8 @@ export default function Dashboard() {
 
                             {/* Equipment count badge */}
                             <Badge
-                                variant="default"
-                                className="absolute top-4 right-4 text-xs"
+                                variant="secondary"
+                                className="absolute top-4 right-4 bg-sidebar text-xs text-muted-foreground"
                             >
                                 {location.equipments_count}{' '}
                                 {location.equipments_count === 1
