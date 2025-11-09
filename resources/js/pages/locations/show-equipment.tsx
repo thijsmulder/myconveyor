@@ -128,7 +128,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
 
     const [columnFilters, setColumnFilters] = useState<Record<string, any>>({});
     const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 25;
+    const [itemsPerPage, setItemsPerPage] = useState(25);
 
     const excludedColumns = [
         'id',
@@ -674,71 +674,90 @@ export default function EquipmentShow({ location, equipment }: Props) {
                     </Table>
                 </Card>
 
-                {totalPages > 1 && (
-                    <div className="mt-4 flex justify-end">
-                        {totalPages > 1 && (
-                            <div className="flex justify-end">
-                                <Pagination>
-                                    <PaginationContent>
-                                        <PaginationItem>
-                                            <PaginationPrevious
-                                                onClick={() =>
-                                                    setCurrentPage((p) =>
-                                                        Math.max(p - 1, 1),
-                                                    )
-                                                }
-                                                className={
-                                                    currentPage === 1
-                                                        ? 'pointer-events-none !pr-1.5 !pl-2 opacity-50'
-                                                        : '!pr-1.5 !pl-2'
-                                                }
-                                            />
-                                        </PaginationItem>
-
-                                        {Array.from(
-                                            { length: totalPages },
-                                            (_, i) => (
-                                                <PaginationItem key={i}>
-                                                    <PaginationLink
-                                                        onClick={() =>
-                                                            setCurrentPage(
-                                                                i + 1,
-                                                            )
-                                                        }
-                                                        isActive={
-                                                            currentPage ===
-                                                            i + 1
-                                                        }
-                                                    >
-                                                        {i + 1}
-                                                    </PaginationLink>
-                                                </PaginationItem>
-                                            ),
-                                        )}
-
-                                        <PaginationItem>
-                                            <PaginationNext
-                                                onClick={() =>
-                                                    setCurrentPage((p) =>
-                                                        Math.min(
-                                                            p + 1,
-                                                            totalPages,
-                                                        ),
-                                                    )
-                                                }
-                                                className={
-                                                    currentPage === totalPages
-                                                        ? 'pointer-events-none !pr-2 !pl-1.5 opacity-50'
-                                                        : '!pr-2 !pl-1.5'
-                                                }
-                                            />
-                                        </PaginationItem>
-                                    </PaginationContent>
-                                </Pagination>
-                            </div>
-                        )}
+                <div className="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
+                    <div className="flex items-center gap-2">
+                        <Label
+                            htmlFor="rows-per-page"
+                            className="text-sm font-medium"
+                        >
+                            Show
+                        </Label>
+                        <Select
+                            value={itemsPerPage.toString()}
+                            onValueChange={(value) => {
+                                setItemsPerPage(parseInt(value));
+                                setCurrentPage(1); // reset to first page when user changes it
+                            }}
+                        >
+                            <SelectTrigger
+                                id="rows-per-page"
+                                className="w-[100px]"
+                            >
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {[10, 25, 50, 100].map((num) => (
+                                    <SelectItem
+                                        key={num}
+                                        value={num.toString()}
+                                    >
+                                        {num}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
                     </div>
-                )}
+
+                    {/* Pagination */}
+                    {totalPages > 1 && (
+                        <Pagination className="justify-end">
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.max(p - 1, 1),
+                                            )
+                                        }
+                                        className={
+                                            currentPage === 1
+                                                ? 'pointer-events-none opacity-50'
+                                                : ''
+                                        }
+                                    />
+                                </PaginationItem>
+
+                                {Array.from({ length: totalPages }, (_, i) => (
+                                    <PaginationItem key={i}>
+                                        <PaginationLink
+                                            onClick={() =>
+                                                setCurrentPage(i + 1)
+                                            }
+                                            isActive={currentPage === i + 1}
+                                        >
+                                            {i + 1}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+
+                                <PaginationItem>
+                                    <PaginationNext
+                                        onClick={() =>
+                                            setCurrentPage((p) =>
+                                                Math.min(p + 1, totalPages),
+                                            )
+                                        }
+                                        className={
+                                            currentPage === totalPages
+                                                ? 'pointer-events-none opacity-50'
+                                                : ''
+                                        }
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    )}
+                </div>
             </div>
         </AppLayout>
     );
