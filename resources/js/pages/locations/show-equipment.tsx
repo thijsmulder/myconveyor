@@ -61,7 +61,9 @@ import {
     EllipsisVertical,
     Filter,
     Hammer,
+    ListPlus,
     LoaderIcon,
+    ScanLine,
     SearchIcon,
     Settings2,
 } from 'lucide-react';
@@ -93,6 +95,7 @@ type EquipmentRecord = {
     sub_section: string;
     track: string;
     category_id: string;
+    category_name?: string;
     customer_erp: string;
     oem_code: string;
     oem_name: string;
@@ -109,7 +112,10 @@ type EquipmentRecord = {
 };
 
 export default function EquipmentShow({ location, equipment }: Props) {
-    const { records } = usePage<{ records: EquipmentRecord[] }>().props;
+    const { records, auth } = usePage<{
+        records: EquipmentRecord[];
+        auth: { user: { role: string } };
+    }>().props;
 
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<number | null>(null);
@@ -118,7 +124,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [visibleColumns, setVisibleColumns] = useState<string[]>([
-        'category_id',
+        'category',
         'quantity',
         'unit',
         'status_id',
@@ -282,7 +288,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
         { key: 'area', label: 'Area' },
         { key: 'section', label: 'Section' },
         { key: 'sub_section', label: 'Sub Section' },
-        { key: 'category_id', label: 'Category' },
+        { key: 'category_name', label: 'Category' },
     ];
 
     return (
@@ -354,6 +360,31 @@ export default function EquipmentShow({ location, equipment }: Props) {
                     </div>
 
                     <div className="flex items-center">
+                        {auth.user.role === 'A' && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="default" className="mr-4">
+                                        <ScanLine className="ml-1 h-4 w-4" />
+                                        Actions
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuLabel>
+                                        Admin actions
+                                    </DropdownMenuLabel>
+                                    <DropdownMenuSeparator />
+                                    <DropdownMenuItem>
+                                        <ListPlus className="ml-1 h-4 w-4" />
+                                        Add new MCID
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem>
+                                        <ScanLine className="ml-1 h-4 w-4" />
+                                        Generate QR links
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        )}
+
                         {/* Columns Dropdown */}
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
@@ -480,10 +511,16 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                                         {uniqueValues.map(
                                                             (val) => (
                                                                 <SelectItem
-                                                                    key={val.toString()}
-                                                                    value={val.toString()}
+                                                                    key={String(
+                                                                        val,
+                                                                    )}
+                                                                    value={String(
+                                                                        val,
+                                                                    )}
                                                                 >
-                                                                    {val.toString()}
+                                                                    {String(
+                                                                        val,
+                                                                    )}
                                                                 </SelectItem>
                                                             ),
                                                         )}
@@ -625,10 +662,14 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                                                         ? renderStatusBadge(
                                                                               record.status_id,
                                                                           )
-                                                                        : record[
-                                                                              col as keyof EquipmentRecord
-                                                                          ]?.toString() ||
-                                                                          '-'}
+                                                                        : col ===
+                                                                            'category_id'
+                                                                          ? record.category_name ||
+                                                                            '-'
+                                                                          : record[
+                                                                                col as keyof EquipmentRecord
+                                                                            ]?.toString() ||
+                                                                            '-'}
                                                                 </TableCell>
                                                             ),
                                                         )}

@@ -61,37 +61,53 @@ class LocationController extends Controller
      */
     public function showEquipment(Location $location, Equipment $equipment)
     {
-        // Eager load the company
         $location->load('company');
 
-        // Build the company table name
-        $companyName = null;
-        if ($location->company) {
-            $companyName = str_replace(' ', '_', strtolower($location->company->name));
-        }
-        $companyTable = 'group_' . $companyName;
+        $companyTable = 'group_' . str_replace(' ', '_', strtolower($location->company?->name ?? ''));
 
-        // Fetch only the specified columns
+        $columns = [
+            'id',
+            'location_id',
+            'equipment_id',
+            'myconveyor_id',
+            'local_id',
+            'area',
+            'section',
+            'sub_section',
+            'track',
+            'category_id',
+            'customer_erp',
+            'oem_code',
+            'oem_name',
+            'oem_description',
+            'supplier_name',
+            'supplier_description',
+            'supplier_code',
+            'quantity',
+            'unit',
+            'status_id',
+            'status_date',
+            'pdf_file',
+            'note',
+        ];
+
+        $columns = array_map(fn($col) => "$companyTable.$col", $columns);
+        $columns[] = 'categories.name as category';
+
         $records = DB::table($companyTable)
-            ->select(
-                'id', 'location_id', 'equipment_id', 'myconveyor_id', 'local_id', 'area', 'section',
-                'sub_section', 'track', 'category_id', 'customer_erp', 'oem_code', 'oem_name', 'oem_description',
-                'supplier_name', 'supplier_description', 'supplier_code', 'quantity', 'unit', 'status_id', 'status_date',
-                'pdf_file', 'note'
-            )
-            ->where('equipment_id', $equipment->id)
-            ->where('location_id', $location->id)
-            ->orderBy('myconveyor_id', 'asc')
+            ->select($columns)
+            ->leftJoin('categories', "$companyTable.category_id", '=', 'categories.id')
+            ->where("$companyTable.equipment_id", $equipment->id)
+            ->where("$companyTable.location_id", $location->id)
+            ->orderBy("$companyTable.myconveyor_id", 'asc')
             ->get();
 
-        // Pass data to Inertia view
         return Inertia::render('locations/show-equipment', [
             'equipment' => $equipment,
             'location' => $location,
             'records' => $records,
         ]);
     }
-
 
     /**
      * Show the form for editing the specified resource.
