@@ -675,38 +675,40 @@ export default function EquipmentShow({ location, equipment }: Props) {
                 </Card>
 
                 <div className="mt-4 flex flex-col items-center justify-between gap-4 sm:flex-row">
-                    <div className="flex items-center gap-2">
-                        <Label
-                            htmlFor="rows-per-page"
-                            className="text-sm font-medium"
-                        >
-                            Show
-                        </Label>
-                        <Select
-                            value={itemsPerPage.toString()}
-                            onValueChange={(value) => {
-                                setItemsPerPage(parseInt(value));
-                                setCurrentPage(1); // reset to first page when user changes it
-                            }}
-                        >
-                            <SelectTrigger
-                                id="rows-per-page"
-                                className="w-[100px]"
+                    {totalPages > 1 && (
+                        <div className="flex items-center gap-2">
+                            <Label
+                                htmlFor="rows-per-page"
+                                className="text-sm font-medium"
                             >
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {[10, 25, 50, 100].map((num) => (
-                                    <SelectItem
-                                        key={num}
-                                        value={num.toString()}
-                                    >
-                                        {num}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                                Show
+                            </Label>
+                            <Select
+                                value={itemsPerPage.toString()}
+                                onValueChange={(value) => {
+                                    setItemsPerPage(parseInt(value));
+                                    setCurrentPage(1); // reset to first page when user changes it
+                                }}
+                            >
+                                <SelectTrigger
+                                    id="rows-per-page"
+                                    className="w-[100px]"
+                                >
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[10, 25, 50, 100].map((num) => (
+                                        <SelectItem
+                                            key={num}
+                                            value={num.toString()}
+                                        >
+                                            {num}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     {/* Pagination */}
                     {totalPages > 1 && (
