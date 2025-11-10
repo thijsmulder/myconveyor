@@ -75,7 +75,6 @@ class LocationController extends Controller
             'section',
             'sub_section',
             'track',
-            'category_id',
             'customer_erp',
             'oem_code',
             'oem_name',

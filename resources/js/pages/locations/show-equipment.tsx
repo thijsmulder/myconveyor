@@ -401,33 +401,32 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                     View columns
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                {allColumns.map((col) => {
-                                    const isSelected =
-                                        visibleColumns.includes(col);
-                                    return (
-                                        <DropdownMenuItem
-                                            key={col}
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                toggleColumn(col);
-                                            }}
-                                            className="flex items-center space-x-2"
-                                        >
-                                            <span className="flex w-4 justify-center">
-                                                {isSelected && (
-                                                    <Check className="h-4 w-4" />
-                                                )}
-                                            </span>
-                                            <span>
-                                                {col
-                                                    .replace(/_/g, ' ')
-                                                    .replace(/^./, (c) =>
-                                                        c.toUpperCase(),
+                                {allColumns
+                                    .slice()
+                                    .sort((a, b) => a.localeCompare(b))
+                                    .map((col) => {
+                                        const isSelected =
+                                            visibleColumns.includes(col);
+                                        return (
+                                            <DropdownMenuItem
+                                                key={col}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    toggleColumn(col);
+                                                }}
+                                                className="flex items-center space-x-2"
+                                            >
+                                                <span className="flex w-4 justify-center">
+                                                    {isSelected && (
+                                                        <Check className="h-4 w-4" />
                                                     )}
-                                            </span>
-                                        </DropdownMenuItem>
-                                    );
-                                })}
+                                                </span>
+                                                <span>
+                                                    {col.replace(/_/g, ' ')}
+                                                </span>
+                                            </DropdownMenuItem>
+                                        );
+                                    })}
                             </DropdownMenuContent>
                         </DropdownMenu>
 
