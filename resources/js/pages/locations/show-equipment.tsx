@@ -58,6 +58,7 @@ import {
     ChevronDown,
     ChevronRight,
     CircleX,
+    EllipsisIcon,
     EllipsisVertical,
     Filter,
     Hammer,
@@ -364,7 +365,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="default" className="mr-4">
-                                        <ScanLine className="ml-1 h-4 w-4" />
+                                        <EllipsisIcon className="ml-1 h-4 w-4" />
                                         Actions
                                     </Button>
                                 </DropdownMenuTrigger>
