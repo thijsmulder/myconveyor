@@ -2,6 +2,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
@@ -9,6 +16,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Input } from '@/components/ui/input';
 import {
     InputGroup,
     InputGroupAddon,
@@ -119,6 +127,8 @@ export default function EquipmentShow({ location, equipment }: Props) {
     }>().props;
 
     const [search, setSearch] = useState('');
+    const [openAddMcid, setOpenAddMcid] = useState(false);
+    const [newMcidName, setNewMcidName] = useState('');
     const [statusFilter, setStatusFilter] = useState<number | null>(null);
     const [sortKey, setSortKey] =
         useState<keyof EquipmentRecord>('myconveyor_id');
@@ -374,9 +384,11 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                         Admin actions
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
+                                    <DropdownMenuItem
+                                        onClick={() => setOpenAddMcid(true)}
+                                    >
                                         <ListPlus className="ml-1 h-4 w-4" />
-                                        Add new MCID
+                                        Create new MCID
                                     </DropdownMenuItem>
                                     <DropdownMenuItem>
                                         <ScanLine className="ml-1 h-4 w-4" />
@@ -802,6 +814,62 @@ export default function EquipmentShow({ location, equipment }: Props) {
                     )}
                 </div>
             </div>
+
+            <Dialog open={openAddMcid} onOpenChange={setOpenAddMcid}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add new MCID</DialogTitle>
+                    </DialogHeader>
+
+                    <div>
+                        <Label htmlFor="mcid-name">MCID</Label>
+                        <div className="flex items-center">
+                            <span className="inline-block rounded-l-md border border-r-0 border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
+                                MCID
+                            </span>
+                            <Input
+                                id="mcid-name"
+                                type="text"
+                                placeholder="Enter numbers…"
+                                value={newMcidName}
+                                onChange={(e) => {
+                                    const numericValue = e.target.value.replace(
+                                        /\D/g,
+                                        '',
+                                    ); // allow only digits
+                                    setNewMcidName(numericValue);
+                                }}
+                                className="rounded-l-none"
+                            />
+                        </div>
+                    </div>
+
+                    <DialogFooter className="flex justify-end gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setNewMcidName('');
+                                setOpenAddMcid(false);
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                if (!newMcidName) return;
+                                console.log('New MCID:', `mcid${newMcidName}`);
+
+                                // TODO: Submit logic here
+
+                                setNewMcidName('');
+                                setOpenAddMcid(false);
+                            }}
+                        >
+                            Save
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </AppLayout>
     );
 }
