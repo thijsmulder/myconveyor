@@ -415,7 +415,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                                     e.preventDefault();
                                                     toggleColumn(col);
                                                 }}
-                                                className="flex items-center space-x-2"
+                                                className="flex items-center space-x-2 capitalize"
                                             >
                                                 <span className="flex w-4 justify-center">
                                                     {isSelected && (
