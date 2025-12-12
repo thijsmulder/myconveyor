@@ -71,7 +71,7 @@ export default function Users() {
     const [currentPage, setCurrentPage] = useState(1);
     const [rowsPerPage, setRowsPerPage] = useState(25);
 
-    // Filter + Sort Logic (Vereenvoudigd, want geen visibleCols meer)
+    // Filter + Sort Logic
     const filteredData = useMemo(() => {
         return users
             .filter((user) =>
@@ -88,7 +88,7 @@ export default function Users() {
                 if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
                 return 0;
             });
-    }, [users, search, sortKey, sortDir]); // Afhankelijkheden zijn nu simpeler
+    }, [users, search, sortKey, sortDir]);
 
     const totalPages = Math.ceil(filteredData.length / rowsPerPage);
 
@@ -113,6 +113,17 @@ export default function Users() {
     const startItem = (currentPage - 1) * rowsPerPage + 1;
     const endItem = Math.min(currentPage * rowsPerPage, filteredData.length);
 
+    // Helper om de sorteer-icoon klassen te genereren
+    const getSortIconClasses = (key: keyof User) => {
+        const baseClasses = 'ml-1 inline h-3 w-3 transition-opacity';
+        // Altijd zichtbaar als de kolom de actieve sorteersleutel is, anders verberg op non-hover
+        const visibilityClasses =
+            sortKey === key
+                ? 'opacity-100'
+                : 'opacity-0 group-hover:opacity-50';
+        return `${baseClasses} ${visibilityClasses}`;
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Users" />
@@ -133,7 +144,6 @@ export default function Users() {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {/* Verwijderde DropdownMenu voor kolommen */}
                         <Button>
                             <Plus className="mr-2 size-4" /> Add user
                         </Button>
@@ -145,37 +155,48 @@ export default function Users() {
                     <Table>
                         <TableHeader>
                             <TableRow className="h-8 bg-primary hover:bg-primary dark:bg-sidebar">
-                                {/* Vaste kolommen */}
+                                {/* Name */}
                                 <TableHead
                                     onClick={() => toggleSort('name')}
-                                    className="cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
+                                    className="group cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
                                 >
                                     Name{' '}
-                                    <ArrowUpDown className="ml-1 inline h-3 w-3 opacity-50" />
+                                    <ArrowUpDown
+                                        className={getSortIconClasses('name')}
+                                    />
                                 </TableHead>
 
+                                {/* Email */}
                                 <TableHead
                                     onClick={() => toggleSort('email')}
-                                    className="cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
+                                    className="group cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
                                 >
                                     Email{' '}
-                                    <ArrowUpDown className="ml-1 inline h-3 w-3 opacity-50" />
+                                    <ArrowUpDown
+                                        className={getSortIconClasses('email')}
+                                    />
                                 </TableHead>
 
+                                {/* Role */}
                                 <TableHead
                                     onClick={() => toggleSort('role')}
-                                    className="cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
+                                    className="group cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
                                 >
                                     Role{' '}
-                                    <ArrowUpDown className="ml-1 inline h-3 w-3 opacity-50" />
+                                    <ArrowUpDown
+                                        className={getSortIconClasses('role')}
+                                    />
                                 </TableHead>
 
+                                {/* Status */}
                                 <TableHead
                                     onClick={() => toggleSort('active')}
-                                    className="cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
+                                    className="group cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
                                 >
                                     Status{' '}
-                                    <ArrowUpDown className="ml-1 inline h-3 w-3 opacity-50" />
+                                    <ArrowUpDown
+                                        className={getSortIconClasses('active')}
+                                    />
                                 </TableHead>
 
                                 <TableHead className="px-4 text-white"></TableHead>
@@ -202,7 +223,7 @@ export default function Users() {
                                         <TableCell className="px-4">
                                             <Badge
                                                 variant="outline"
-                                                className=" font-normal"
+                                                className="font-normal"
                                             >
                                                 {user.role === 'RO'
                                                     ? 'Read Only'

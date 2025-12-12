@@ -303,6 +303,19 @@ export default function EquipmentShow({ location, equipment }: Props) {
         { key: 'category_name', label: 'Category' },
     ];
 
+    const getSortIconClasses = useCallback(
+        (key: keyof EquipmentRecord) => {
+            const baseClasses =
+                'ml-1 inline h-3 w-3 transition-opacity duration-200 opacity-0 group-hover:opacity-50';
+
+            const activeClasses =
+                sortKey === key ? 'opacity-100 group-hover:opacity-100' : '';
+
+            return `${baseClasses} ${activeClasses}`;
+        },
+        [sortKey],
+    );
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Equipment Records" />
@@ -578,10 +591,16 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                                 col as keyof EquipmentRecord,
                                             )
                                         }
+                                        // Zorg ervoor dat de "group" klasse hier staat
                                         className="group cursor-pointer px-4 text-xs font-black tracking-wider text-white uppercase"
                                     >
                                         {col.replace(/_/g, ' ')}
-                                        <ArrowUpDown className="ml-1 inline h-4 w-4 opacity-0 transition-opacity duration-200 group-hover:opacity-50" />
+                                        {/* Gebruik de helperfunctie om de styling te bepalen */}
+                                        <ArrowUpDown
+                                            className={getSortIconClasses(
+                                                col as keyof EquipmentRecord,
+                                            )}
+                                        />
                                     </TableHead>
                                 ))}
                                 <TableHead className="px-4 text-white"></TableHead>
