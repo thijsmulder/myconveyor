@@ -7,21 +7,30 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class LocationController extends Controller
 {
+    private const EQUIPMENT_RECORD_COLUMNS = [
+        'id', 'location_id', 'equipment_id', 'myconveyor_id', 'local_id',
+        'area', 'section', 'sub_section', 'track', 'customer_erp',
+        'oem_code', 'oem_name', 'oem_description', 'supplier_name',
+        'supplier_description', 'supplier_code', 'quantity', 'unit',
+        'status_id', 'status_date', 'pdf_file', 'note'
+    ];
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): Response
     {
-        $locations = Location::with('company:id,name')
-            ->withCount('equipments')
-            ->orderBy('name', 'asc')
-            ->get();
-
         return Inertia::render('locations/index', [
-            'locations' => $locations,
+            'locations' => Location::query()
+                ->with('company:id,name')
+                ->withCount('equipments')
+                ->orderBy('name')
+                ->paginate(100)
+                ->withQueryString(),
         ]);
     }
 
@@ -44,61 +53,30 @@ class LocationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $slug)
+    public function show(Location $location): Response
     {
-        $location = Location::with(['company', 'equipments:id,name,slug,location_id'])
-            ->where('slug', $slug)
-            ->firstOrFail();
-
-        // Pass to Inertia
         return Inertia::render('locations/show', [
-            'location' => $location,
+            'location' => $location->load(['company', 'equipments:id,name,slug,location_id']),
         ]);
     }
 
     /**
      * Display the specified resource in detail.
      */
-    public function showEquipment(Location $location, Equipment $equipment)
+    public function showEquipment(Location $location, Equipment $equipment): Response
     {
-        $location->load('company');
+        $location->loadMissing('company');
+        $tableName = $location->company_table_name;
 
-        $companyTable = 'group_' . str_replace(' ', '_', strtolower($location->company?->name ?? ''));
-
-        $columns = [
-            'id',
-            'location_id',
-            'equipment_id',
-            'myconveyor_id',
-            'local_id',
-            'area',
-            'section',
-            'sub_section',
-            'track',
-            'customer_erp',
-            'oem_code',
-            'oem_name',
-            'oem_description',
-            'supplier_name',
-            'supplier_description',
-            'supplier_code',
-            'quantity',
-            'unit',
-            'status_id',
-            'status_date',
-            'pdf_file',
-            'note',
-        ];
-
-        $columns = array_map(fn($col) => "$companyTable.$col", $columns);
+        $columns = array_map(fn($col) => "{$tableName}.{$col}", self::EQUIPMENT_RECORD_COLUMNS);
         $columns[] = 'categories.name as category';
 
-        $records = DB::table($companyTable)
+        $records = DB::table($tableName)
             ->select($columns)
-            ->leftJoin('categories', "$companyTable.category_id", '=', 'categories.id')
-            ->where("$companyTable.equipment_id", $equipment->id)
-            ->where("$companyTable.location_id", $location->id)
-            ->orderBy("$companyTable.myconveyor_id", 'asc')
+            ->leftJoin('categories', "{$tableName}.category_id", '=', 'categories.id')
+            ->where("{$tableName}.equipment_id", $equipment->id)
+            ->where("{$tableName}.location_id", $location->id)
+            ->orderBy("{$tableName}.myconveyor_id")
             ->get();
 
         return Inertia::render('locations/show-equipment', [

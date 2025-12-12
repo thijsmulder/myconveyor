@@ -13,6 +13,11 @@ class Location extends Model
         return 'slug';
     }
 
+    public function getCompanyTableNameAttribute(): string
+    {
+        return 'group_' . str_replace(' ', '_', strtolower($this->company?->name ?? ''));
+    }
+
     public function company()
     {
         return $this->belongsTo(Company::class, 'company_id');

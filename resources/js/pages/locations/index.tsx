@@ -16,12 +16,17 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Dashboard() {
     const { locations } = usePage<{
         locations: {
-            id: number;
-            name: string;
-            slug: string;
-            company?: { name: string };
-            equipments_count: number;
-        }[];
+            data: {
+                id: number;
+                name: string;
+                slug: string;
+                company?: { name: string };
+                equipments_count: number;
+            }[];
+            links: never[];
+            current_page: number;
+            last_page: number;
+        };
     }>().props;
 
     return (
@@ -29,21 +34,18 @@ export default function Dashboard() {
             <Head title="Dashboard" />
             <div className="p-6">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    {locations.map((location) => (
+                    {locations.data.map((location) => (
                         <Card
                             key={location.id}
                             className="relative flex flex-col gap-2 p-4 shadow-none"
                         >
-                            {/* Location name */}
                             <CardTitle>{location.name || 'N/A'}</CardTitle>
 
-                            {/* Company name */}
                             <p className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <Building className="size-4" />{' '}
                                 {location.company?.name || 'N/A'}
                             </p>
 
-                            {/* Equipment count badge */}
                             <Badge
                                 variant="secondary"
                                 className="absolute top-4 right-4 bg-sidebar text-xs text-muted-foreground"
@@ -54,7 +56,6 @@ export default function Dashboard() {
                                     : 'equipments'}
                             </Badge>
 
-                            {/* Button to go to location/{slug} */}
                             <Link
                                 href={`/locations/${location.slug}`}
                                 className="mt-2 w-fit"
@@ -64,6 +65,15 @@ export default function Dashboard() {
                         </Card>
                     ))}
                 </div>
+
+                {locations.last_page > 1 && (
+                    <div className="mt-6 flex gap-2">
+                        <p className="text-sm text-muted-foreground">
+                            Page {locations.current_page} of{' '}
+                            {locations.last_page}
+                        </p>
+                    </div>
+                )}
             </div>
         </AppLayout>
     );
