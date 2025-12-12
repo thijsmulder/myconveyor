@@ -143,10 +143,11 @@ export default function EquipmentShow({ location, equipment }: Props) {
         'pdf_file',
     ]);
 
-    const [columnFilters, setColumnFilters] = useState<Record<string, any>>({});
+    const [columnFilters, setColumnFilters] = useState<Record<string, unknown>>({});
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(25);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const excludedColumns = [
         'id',
         'location_id',
@@ -159,7 +160,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
             Object.keys(records[0] || {}).filter(
                 (col) => !excludedColumns.includes(col),
             ),
-        [records],
+        [excludedColumns, records],
     );
 
     const filteredData = useMemo(() => {
@@ -220,7 +221,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
             );
             setSortKey(key);
         },
-        [sortKey],
+        [excludedColumns, sortKey],
     );
 
     const toggleColumn = useCallback((col: string) => {
@@ -740,7 +741,7 @@ export default function EquipmentShow({ location, equipment }: Props) {
                                 value={itemsPerPage.toString()}
                                 onValueChange={(value) => {
                                     setItemsPerPage(parseInt(value));
-                                    setCurrentPage(1); // reset to first page when user changes it
+                                    setCurrentPage(1);
                                 }}
                             >
                                 <SelectTrigger
